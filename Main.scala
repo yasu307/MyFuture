@@ -1,5 +1,5 @@
 import scala.util.{Try, Success, Failure}
-import com.yusuke.myconcurrent.MyFuture
+import mycon.MyFuture
 
 object Main{
   def main(args: Array[String]): Unit = {

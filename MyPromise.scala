@@ -1,4 +1,4 @@
-package com.yusuke.myconcurrent
+package mycon
 
 import scala.util.{Try, Success, Failure}
 
