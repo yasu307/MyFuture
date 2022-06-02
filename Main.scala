@@ -22,6 +22,6 @@ object Main{
 
     // MyFuture(123).onComplete(println)
     // MyFuture(2/0).onComplete(println)
-    val result = MyFuture.successful(1, "one").flatMap(i => MyFuture.successful(2, "two").map((_ + i), "three"), "four").onComplete((i => println(i)), "five")
+    MyFuture.successful(1, "one").flatMap(i => MyFuture.successful(2, "two").map((_ + i), "three"), "four").onComplete((i => println(i)), "five")
   }
 }
