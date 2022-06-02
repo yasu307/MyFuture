@@ -37,38 +37,40 @@ object MyPromise extends LazyLogging {
     }
 
     override def onComplete[U](f: Try[T] => U, name: String = "default"): Unit = {
-      logger.debug(s"${this.name} 's onComplete. $name callback is added")
+      logger.debug(s"${this.name} 's onComplete. $name 's function is passed")
       // 引数の変換を持つ新しいコールバックを生成
       val newRunnable = new CallbackRunnable[T](f, name)
       get match {
         // 処理が完了していたら新しく作成したコールバックを実行する
         case t: Try[T]                      =>
+          logger.debug(s"${this.name} has finished. so $name 's callback is executed")
           newRunnable.value = t
           new java.lang.Thread(newRunnable).start()
         // 処理が完了していなければコールバックのリストに新しく生成したコールバックを加える
         case list: Seq[CallbackRunnable[T]] =>
+          logger.debug(s"${this.name} hasn't finished. so $name 's callback is added to ${this.name} 's callbacklist")
           set(newRunnable +: list)
       }
     }
 
     override def transform[S](f: Try[T] => Try[S], name: String = "default"): MyFuture[S] = {
-      logger.debug(s"${this.name} 's transform. $name callback is added")
+      logger.debug(s"${this.name} 's transform. $name 's function is passed")
       // 新しいMyFuturePromiseを作成
-      val promise = new DefaultPromise[S](s"transform from $name")
+      val promise = new DefaultPromise[S](name)
       // このクラス(MyFuturePromise)にコールバックを追加する
       // 結果を引数で変換し、新しく作成したMyFuturePromiseの結果として格納する
       onComplete(
         { result =>
           promise.tryComplete(f(result))
         },
-        name
+        s"${this.name}'s-callback-propagation-for-$name"
       )
       // MyFuturePromiseをMyFutureとして返す
       promise.future
     }
     override def transformWith[S](f: Try[T] => MyFuture[S], name: String = "default"): MyFuture[S] = {
-      logger.debug(s"${this.name} 's transformWith. $name callback is added")
-      val promise = new DefaultPromise[S](s"transformWith from $name")
+      logger.debug(s"${this.name} 's transformWith. $name 's function is passed")
+      val promise = new DefaultPromise[S](name)
       // 結果を引数で変換する。変換後のMyFutureに以下のコールバックを追加する
       // 結果を新しく作成したpromiseに格納する
       onComplete(
@@ -77,22 +79,22 @@ object MyPromise extends LazyLogging {
             { r2 =>
               promise.tryComplete(r2)
             },
-            name
+            s"${this.name}'s-inner-callback-propagation-for-$name"
           )
         },
-        name
+        s"${this.name}'s-outer-callback-propagation-for-$name"
       )
       // 新しく作成した
       promise.future
     }
 
     override def map[S](f: T => S, name: String = "default"): MyFuture[S] = {
-      logger.debug(s"${this.name} 's map. $name callback is added")
+      logger.debug(s"${this.name} 's map. $name 's function is passed")
       transform((_ map f), name)
     }
 
     override def flatMap[S](f: T => MyFuture[S], name: String = "default"): MyFuture[S] = {
-      logger.debug(s"${this.name} 's flatMap. $name callback is added")
+      logger.debug(s"${this.name} 's flatMap. $name 's function is passed")
       transformWith(
         {
           case Success(s) => f(s)
@@ -100,6 +102,11 @@ object MyPromise extends LazyLogging {
         },
         name
       )
+    }
+
+    override def toString: String = get match {
+      case Some(result) => "Future("+result+")"
+      case None => "Future(<not completed>)"
     }
   }
 }
@@ -112,7 +119,9 @@ class CallbackRunnable[T](f: Try[T] => Any, name: String = "default") extends Ru
   // 戻り値の型がUnitでいいのか？ runの結果はどうやってコールバック宣言元に渡されるのか
   // このメソッドの結果（コールバックで渡された変換の結果）がFutureに渡されるわけではない
   override def run(): Unit = {
+    logger.debug(s"$name 's callbackrunnable start")
     require(value ne null) // must set value to non-null before running!
     f(value)
+    logger.debug(s"$name 's callbackrunnable end")
   }
 }
