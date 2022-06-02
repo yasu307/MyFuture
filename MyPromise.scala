@@ -8,11 +8,11 @@ trait MyPromise[T] {
 }
 
 object MyPromise {
-  def apply[T](): MyPromise[T] = new impl.MyPromise.DefaultPromise[T]()
-  def failed[T](exception: Throwable): MyPromise[T] = fromTry(Failure(exception))
-  def successful[T](result: T): MyPromise[T] = fromTry(Success(result))
-  def fromTry[T](result: Try[T]): MyPromise[T] = {
-    val myPromise = new impl.MyPromise.DefaultPromise[T]()
+  def apply[T](name: String = "default"): MyPromise[T] = new impl.MyPromise.DefaultPromise[T](name)
+  def failed[T](exception: Throwable, name: String = "default"): MyPromise[T] = fromTry(Failure(exception), name)
+  def successful[T](result: T, name: String = "default"): MyPromise[T] = fromTry(Success(result), name)
+  def fromTry[T](result: Try[T], name: String = "default"): MyPromise[T] = {
+    val myPromise = new impl.MyPromise.DefaultPromise[T](name)
     myPromise.set(result)
     myPromise
   } 

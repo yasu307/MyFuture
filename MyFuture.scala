@@ -3,20 +3,17 @@ package com.yusuke.myconcurrent
 import scala.util.{Try, Success, Failure}
 
 trait MyFuture[+T] {
-  def onComplete[U](f: Try[T] => U): Unit
-  def transform[S](f: Try[T] => Try[S]): MyFuture[S]
-  def transformWith[S](f: Try[T] => MyFuture[S]): MyFuture[S]
-  def map[S](f: T => S): MyFuture[S] = transform(_ map f)
-  def flatMap[S](f: T => MyFuture[S]): MyFuture[S] = transformWith {
-    case Success(s) => f(s)
-    case Failure(_) => this.asInstanceOf[MyFuture[S]]
-  }
+  def onComplete[U](f: Try[T] => U, name: String = "default"): Unit
+  def transform[S](f: Try[T] => Try[S], name: String = "default"): MyFuture[S]
+  def transformWith[S](f: Try[T] => MyFuture[S], name: String = "default"): MyFuture[S]
+  def map[S](f: T => S, name: String = "default"): MyFuture[S]
+  def flatMap[S](f: T => MyFuture[S], name: String = "default"): MyFuture[S]
 }
 
 object MyFuture {
-  val unit: MyFuture[Unit] = successful(())
-  def failed[T](exception: Throwable): MyFuture[T] = MyPromise.failed(exception).future
-  def successful[T](result: T): MyFuture[T] = MyPromise.successful(result).future
-  def fromTry[T](result: Try[T]): MyFuture[T] = MyPromise.fromTry(result).future
-  def apply[T](body: =>T): MyFuture[T] = unit.map(_ => body)
+  def unit(name: String = "default"): MyFuture[Unit] = successful((), name)
+  def failed[T](exception: Throwable, name: String = "default"): MyFuture[T] = MyPromise.failed(exception, name).future
+  def successful[T](result: T, name: String = "default"): MyFuture[T] = MyPromise.successful(result, name).future
+  def fromTry[T](result: Try[T], name: String = "default"): MyFuture[T] = MyPromise.fromTry(result, name).future
+  def apply[T](body: =>T, name: String = "default"): MyFuture[T] = unit(name).map(_ => body, name)
 }
