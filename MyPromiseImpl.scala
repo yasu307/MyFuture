@@ -55,6 +55,7 @@ object MyPromise{
     var value: AnyRef = Nil
 
     // valueに値を格納するメソッド
+    // 結果の処理が終わったら呼び出される
     override def tryComplete(result: Try[T]): Boolean = value match {
       // もし既に結果が格納されていれば何もせずfalseを返す
       case _: Try[_]       =>
