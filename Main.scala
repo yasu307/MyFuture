@@ -18,7 +18,9 @@ object Main {
     }
 
     // tranforsm, transformWithメソッド作成後
-    MyFuture.successful(3).transform(_ map (_ * 2))
-    MyFuture.successful(4).transformWith(i => MyFuture.successful(i.map(_ * 2)))
+    val fut = MyFuture.successful(3).transform(_ map (_ * 2))
+    fut.onComplete(println)
+    val fut2 = MyFuture.successful(4).transformWith(i => MyFuture.successful(i.map(_ * 2)))
+    fut2.onComplete(println)
   }
 }

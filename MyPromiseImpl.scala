@@ -6,12 +6,12 @@ import java.util.concurrent.atomic.AtomicReference
 trait MyPromise[T]
   extends com.yusuke.myconcurrent.MyFuture[T] with com.yusuke.myconcurrent.MyPromise[T] {
   // ただ本体を返しているだけ、MyFutureを継承しているのでMyFuture型として返すことができる
+  // Promiseメソッドでも使われていた
   def future = this
 
   // transform, transformWithメソッドのためにインポート
   import com.yusuke.myconcurrent.MyFuture
   import com.yusuke.myconcurrent.impl.MyPromise.DefaultPromise
-
   
   override def transform[S](f: Try[T] => Try[S]): MyFuture[S] = {
     // 新しいDefaultPromiseを作成
@@ -83,12 +83,12 @@ object MyPromise{
 
 // 一つのコールバックを表す
 // 引数にコールバックとして実行する変換をとる
+// 非同期に処理が可能
 class CallbackRunnable[T](f: Try[T] => Any) extends Runnable {
-  // DefaultPromiseの結果をもつ
+  // DefaultPromiseの結果の処理が終了したら、その値が格納される
   // 最初はnullだがDefaultPromiseの結果の処理が終わったら代入される
   var value: Try[T] = null
 
-  // runの結果はどうやってコールバック宣言元に渡されるのか
   // Runnable.runを継承
   // java.lang.Threadから非同期に実行できる
   override def run(): Unit = {
