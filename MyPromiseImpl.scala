@@ -1,7 +1,6 @@
 package com.yusuke.myconcurrent.impl
 
 import scala.util.{ Try, Success, Failure }
-import java.util.concurrent.atomic.AtomicReference
 
 trait MyPromise[T]
   extends com.yusuke.myconcurrent.MyFuture[T] with com.yusuke.myconcurrent.MyPromise[T] {
@@ -63,6 +62,7 @@ object MyPromise{
       // もしコールバックのリストが格納されていれば、値を格納する
       // さらにコールバックの値に結果をセットし、コールバックを実行する
       case list: Seq[CallbackRunnable[T]] =>
+        value = result
         list.foreach { l =>
           if(l.value == null){
             l.value = result
