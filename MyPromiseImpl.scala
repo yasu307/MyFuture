@@ -25,6 +25,7 @@ object MyPromise extends LazyLogging {
         // もしコールバックのリストが格納されていれば、格納し、さらにコールバックにも値をセットし、コールバックを実行する
         case list: Seq[CallbackRunnable[T]] =>
           logger.debug(s"$name's tryComplete. value is $result")
+          this.set(result)
           list.foreach { l =>
             // コールバックの値に結果が設定されていなければ、値を設定する
             if (l.value == null) {
