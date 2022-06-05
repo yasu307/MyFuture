@@ -10,6 +10,7 @@ object Main {
       case Failure(e) => println(e.getMessage())
     }
 
+    // Awaitが使えないのでメインスレッドを停止して、MyFutureの処理を待つ
     Thread.sleep(3000)
 
     val failed: MyFuture[Int] = MyFuture.failed(new Exception("error!"))
@@ -19,6 +20,7 @@ object Main {
       case Failure(e) => println(e.getMessage())
     }
 
+    // Awaitが使えないのでメインスレッドを停止して、MyFutureの処理を待つ
     Thread.sleep(3000)
 
     // tranforsm, transformWithメソッド作成後
@@ -27,7 +29,7 @@ object Main {
     val fut2 = MyFuture.successful(4).transformWith(i => MyFuture.successful(i.map(_ * 2)))
     fut2.onComplete(println)
 
+    // Awaitが使えないのでメインスレッドを停止して、MyFutureの処理を待つ
     Thread.sleep(3000)
-
   }
 }
