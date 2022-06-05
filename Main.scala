@@ -10,6 +10,8 @@ object Main {
       case Failure(e) => println(e.getMessage())
     }
 
+    Thread.sleep(3000)
+
     val failed: MyFuture[Int] = MyFuture.failed(new Exception("error!"))
     failed.onComplete(println)
     failed.onComplete{
@@ -17,10 +19,15 @@ object Main {
       case Failure(e) => println(e.getMessage())
     }
 
+    Thread.sleep(3000)
+
     // tranforsm, transformWithメソッド作成後
     val fut = MyFuture.successful(3).transform(_ map (_ * 2))
     fut.onComplete(println)
     val fut2 = MyFuture.successful(4).transformWith(i => MyFuture.successful(i.map(_ * 2)))
     fut2.onComplete(println)
+
+    Thread.sleep(3000)
+
   }
 }
