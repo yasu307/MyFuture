@@ -40,9 +40,10 @@ trait MyPromise[T]
     // 新しく作成したDefaultPromiseをMyFutureとして返す
     promise.future
   }
+    // map-flatMapから追加
   override def map[S](f: T => S): MyFuture[S] = transform(_ map f)
 
-
+  // map-flatMapから追加
   override def flatMap[S](f: T => MyFuture[S]): MyFuture[S] = transformWith {
     case Success(s) => f(s)
     case Failure(_) => this.asInstanceOf[MyFuture[S]]

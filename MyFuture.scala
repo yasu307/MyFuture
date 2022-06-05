@@ -6,6 +6,7 @@ trait MyFuture[+T] {
   def onComplete[U](f: Try[T] => U): Unit
   def transform[S](f: Try[T] => Try[S]): MyFuture[S]
   def transformWith[S](f: Try[T] => MyFuture[S]): MyFuture[S]
+    // map-flatMapから追加
   // 本来はここにコードが書いてあるが、見づらいので移動する
   def map[S](f: T => S): MyFuture[S]
   def flatMap[S](f: T => MyFuture[S]): MyFuture[S]

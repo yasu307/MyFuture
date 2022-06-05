@@ -24,6 +24,7 @@ object Main {
     // 結果が表示される時もあるので別スレッドの処理が終わる前にメインスレッドが終了してしまっていると思っていたのですが
     // Thread.sleepしても改善されないため何かしら別の原因があるのかもしれません。
     // 原因を突き止めようと内部処理の中でprintやloggerを使用すると、結果が表示されてしまうため、原因がわからない状態です
+    // 同様の問題はfirstブランチにmap, flatMapメソッドを追加しても発生します
     MyFuture.successful(1).flatMap(i => MyFuture.successful(2).map(_ + i)).onComplete(println)
   }
 }
