@@ -55,6 +55,7 @@ object MyPromise{
       // もしコールバックのリストが格納されていれば、値を格納する
       // さらにコールバックの値に結果をセットし、コールバックを実行する
       case list: Seq[CallbackRunnable[T]] =>
+        value = result
         list.foreach { l =>
           if(l.value == null){
             l.value = result
